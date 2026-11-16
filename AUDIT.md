@@ -50,3 +50,9 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 - HSTS is emitted only when Laravel detects an HTTPS request. Reverse-proxy deployments must configure trusted proxies and HTTPS termination correctly.
 - This audit and its tests do not replace production infrastructure review, dependency vulnerability monitoring, backup/restore testing, or manual browser testing.
 
+
+
+### CI verification
+- Audit v2 test run: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824083161
+- Result: success — 28 tests, 104 assertions, PHP 8.3.36 / PHPUnit 12.5.44.
+- A follow-up seeder hardening change now enforces mixed case, numeric and symbol characters in configured initial admin passwords, with an additional regression test. Its workflow run is triggered by the latest commit and must be checked separately before counting that newest test as passed.

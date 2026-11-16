@@ -6,6 +6,7 @@ use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 use Tests\TestCase;
 
 class DatabaseSeederTest extends TestCase
@@ -30,6 +31,18 @@ class DatabaseSeederTest extends TestCase
             'id' => 1,
             'office_name' => 'Nama Kelurahan',
         ]);
+    }
+
+    public function test_database_seeder_rejects_a_weak_admin_password(): void
+    {
+        config([
+            'portal.admin.name' => 'Admin Test',
+            'portal.admin.email' => 'admin@kelurahan.test',
+            'portal.admin.password' => 'passwordonly123',
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->seed();
     }
 
     public function test_database_seeder_does_not_reset_an_existing_admin_password(): void
