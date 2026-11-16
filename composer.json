@@ -34,7 +34,7 @@
       "@php artisan package:discover --ansi"
     ],
     "test": [
-      "@php artisan test"
+      "@php vendor/bin/phpunit"
     ]
   },
   "config": {

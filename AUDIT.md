@@ -20,5 +20,5 @@ Tanggal audit: 16 November 2026
 - Submit dan validasi formulir kontak.
 - Seeder membuat admin awal dan tidak menimpa password admin yang sudah ada.
 
-## Batas pemeriksaan
+## Batas audit
 Test suite dan GitHub Actions sudah disiapkan, tetapi status lulus/gagal harus dilihat pada tab Actions setelah workflow selesai. Lingkungan pembuatan tidak memiliki akses jaringan ke Composer, jadi composer.lock belum bisa diperbarui dan pipeline menjalankan composer update. Belum ada klaim bahwa seluruh tes runtime sudah lulus.
