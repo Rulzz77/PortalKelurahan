@@ -27,11 +27,19 @@ class SettingController extends Controller
         ]);
         unset($data['logo']);
         $settings = SiteSetting::current();
+        $oldLogoPath = $settings->logo_path;
+        $newLogoPath = null;
         if ($request->hasFile('logo')) {
-            if ($settings->logo_path) Storage::disk('public')->delete($settings->logo_path);
-            $data['logo_path'] = $request->file('logo')->store('branding', 'public');
+            $newLogoPath = $request->file('logo')->store('branding', 'public');
+            if (! $newLogoPath) {
+                return back()->withErrors(['logo' => 'Logo gagal disimpan. Logo lama tetap digunakan.'])->withInput();
+            }
+            $data['logo_path'] = $newLogoPath;
         }
         $settings->update($data);
+        if ($newLogoPath && $oldLogoPath) {
+            Storage::disk('public')->delete($oldLogoPath);
+        }
         return back()->with('success', 'Pengaturan website berhasil disimpan.');
     }
 }

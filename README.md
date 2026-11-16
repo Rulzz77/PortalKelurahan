@@ -20,3 +20,17 @@ Pipeline sementara menjalankan composer update untuk menyelesaikan dependency PH
 Cakupan tes meliputi autentikasi dan role admin, akses dashboard, CRUD layanan dan berita tanpa slug manual, update akun tanpa password baru, penyimpanan pengaturan, upload galeri, pencegahan struktur organisasi melingkar, render halaman publik, formulir kontak, serta pembuatan admin melalui seeder.
 
 Tes otomatis bukan pengganti uji penerimaan pengguna, audit keamanan deployment, atau verifikasi data resmi kelurahan.
+
+
+## Security hardening
+
+- Global security headers: nosniff, same-origin framing, strict referrer policy, and restricted browser permissions.
+- Responses from authenticated admin pages are marked private and no-store.
+- The session cookie can be configured as Secure. Keep `SESSION_SECURE_COOKIE=false` for local HTTP development; set it to `true` when the production site is served over HTTPS.
+- New passwords must contain at least 12 characters, uppercase and lowercase letters, numbers, and symbols.
+- Social media links accept only HTTP/HTTPS URLs.
+- Image uploads accept raster images only (JPG, PNG, WebP) and are size-limited. SVG uploads are not accepted.
+- User-provided article and profile text is escaped on output; this portal intentionally does not render raw user HTML.
+- Admin pages are protected by role middleware; login and public contact form have request throttling.
+
+A Content-Security-Policy header is intentionally not enabled yet because the current Blade pages contain inline JavaScript and load styles/scripts from specific CDNs. Add CSP only after moving inline scripts to nonce-protected or external assets and explicitly allow the required tile/font/CDN origins; a generic restrictive CSP would break the map and page interactions.

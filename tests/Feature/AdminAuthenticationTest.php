@@ -11,10 +11,46 @@ class AdminAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_login_is_rate_limited_after_repeated_failures(): void
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post(route('admin.login.submit'), [
+                'email' => 'unknown@example.test',
+                'password' => 'WrongPassword!123',
+            ])->assertRedirect();
+        }
+
+        $this->post(route('admin.login.submit'), [
+            'email' => 'unknown@example.test',
+            'password' => 'WrongPassword!123',
+        ])->assertStatus(429);
+    }
+
     public function test_guest_cannot_open_admin_dashboard(): void
     {
         $this->get(route('admin.dashboard'))
             ->assertRedirect(route('admin.login'));
+    }
+
+    public function test_new_user_role_defaults_to_non_admin(): void
+    {
+        $user = User::create([
+            'name' => 'Regular User',
+            'email' => 'new-user@example.test',
+            'password' => Hash::make('UserStrongPass!123'),
+        ]);
+
+        $this->assertSame('user', $user->fresh()->role);
+        $this->actingAs($user)->get(route('admin.dashboard'))->assertForbidden();
+    }
+
+    public function test_guest_cannot_submit_admin_content(): void
+    {
+        $this->post(route('admin.services.store'), [
+            'name' => 'Layanan Tidak Sah',
+        ])->assertRedirect(route('admin.login'));
+
+        $this->assertDatabaseCount('services', 0);
     }
 
     public function test_admin_can_log_in_and_open_dashboard(): void

@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
             throw new RuntimeException('ADMIN_EMAIL harus diisi dengan alamat email yang valid.');
         }
 
-        if (mb_strlen($password) < 10) {
-            throw new RuntimeException('ADMIN_PASSWORD harus memiliki minimal 10 karakter.');
+        if (mb_strlen($password) < 12) {
+            throw new RuntimeException('ADMIN_PASSWORD harus memiliki minimal 12 karakter.');
         }
 
         if (app()->environment('production') && (

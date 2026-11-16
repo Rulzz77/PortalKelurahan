@@ -137,6 +137,94 @@ class AdminContentManagementTest extends TestCase
         $this->assertTrue($gallery->is_published);
     }
 
+    public function test_weak_new_password_is_rejected(): void
+    {
+        $this->put(route('admin.account.update'), [
+            'name' => 'Administrator',
+            'current_password' => 'AdminStrongPass!123',
+            'password' => 'weakpassword',
+            'password_confirmation' => 'weakpassword',
+        ])->assertSessionHasErrors('password');
+    }
+
+    public function test_admin_can_change_to_a_strong_password(): void
+    {
+        $this->put(route('admin.account.update'), [
+            'name' => 'Administrator',
+            'current_password' => 'AdminStrongPass!123',
+            'password' => 'NewStrongPassword!2026',
+            'password_confirmation' => 'NewStrongPassword!2026',
+        ])->assertRedirect();
+
+        $this->assertTrue(Hash::check('NewStrongPassword!2026', $this->admin->fresh()->password));
+    }
+
+    public function test_social_media_urls_must_use_http_or_https(): void
+    {
+        $this->put(route('admin.settings.update'), [
+            'office_name' => 'Kelurahan Contoh',
+            'hero_title' => 'Selamat Datang',
+            'instagram_url' => 'javascript:alert(1)',
+        ])->assertSessionHasErrors('instagram_url');
+    }
+
+    public function test_gallery_rejects_non_image_uploads(): void
+    {
+        Storage::fake('public');
+
+        $this->from(route('admin.galleries.create'))
+            ->post(route('admin.galleries.store'), [
+                'title' => 'File Tidak Valid',
+                'image' => UploadedFile::fake()->createWithContent('not-an-image.jpg', 'plain text is not an image'),
+            ])
+            ->assertSessionHasErrors('image');
+
+        $this->assertDatabaseCount('galleries', 0);
+    }
+
+    public function test_replacing_gallery_image_keeps_old_file_until_new_record_is_saved(): void
+    {
+        Storage::fake('public');
+        $oldPath = 'gallery/old-photo.jpg';
+        Storage::disk('public')->put($oldPath, 'old image placeholder');
+
+        $gallery = Gallery::create([
+            'title' => 'Foto Lama',
+            'image_path' => $oldPath,
+            'is_published' => true,
+        ]);
+
+        $this->put(route('admin.galleries.update', $gallery), [
+            'title' => 'Foto Baru',
+            'is_published' => '1',
+            'image' => UploadedFile::fake()->image('new-photo.png', 640, 480),
+        ])->assertRedirect(route('admin.galleries.index'));
+
+        $gallery->refresh();
+        $this->assertNotSame($oldPath, $gallery->image_path);
+        Storage::disk('public')->assertExists($gallery->image_path);
+        Storage::disk('public')->assertMissing($oldPath);
+    }
+
+    public function test_deleting_gallery_record_also_removes_its_image(): void
+    {
+        Storage::fake('public');
+        $path = 'gallery/to-delete.jpg';
+        Storage::disk('public')->put($path, 'image placeholder');
+
+        $gallery = Gallery::create([
+            'title' => 'Foto Dihapus',
+            'image_path' => $path,
+            'is_published' => true,
+        ]);
+
+        $this->delete(route('admin.galleries.destroy', $gallery))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('galleries', ['id' => $gallery->id]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
     public function test_admin_cannot_create_a_circular_staff_hierarchy(): void
     {
         $first = Staff::create([

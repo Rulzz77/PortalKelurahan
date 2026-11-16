@@ -16,7 +16,11 @@ class GalleryController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->data($request);
-        $data['image_path'] = $request->file('image')->store('gallery', 'public');
+        $imagePath = $request->file('image')->store('gallery', 'public');
+        if (! $imagePath) {
+            return back()->withErrors(['image' => 'Foto gagal disimpan. Silakan coba kembali.'])->withInput();
+        }
+        $data['image_path'] = $imagePath;
         Gallery::create($data);
         return redirect()->route('admin.galleries.index')->with('success', 'Foto galeri berhasil ditambahkan.');
     }
@@ -24,17 +28,26 @@ class GalleryController extends Controller
     public function update(Request $request, Gallery $gallery): RedirectResponse
     {
         $data = $this->data($request, false);
+        $oldImagePath = $gallery->image_path;
+        $newImagePath = null;
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($gallery->image_path);
-            $data['image_path'] = $request->file('image')->store('gallery', 'public');
+            $newImagePath = $request->file('image')->store('gallery', 'public');
+            if (! $newImagePath) {
+                return back()->withErrors(['image' => 'Foto gagal disimpan. Foto lama tetap digunakan.'])->withInput();
+            }
+            $data['image_path'] = $newImagePath;
         }
         $gallery->update($data);
+        if ($newImagePath && $oldImagePath) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
         return redirect()->route('admin.galleries.index')->with('success', 'Foto galeri diperbarui.');
     }
     public function destroy(Gallery $gallery): RedirectResponse
     {
-        Storage::disk('public')->delete($gallery->image_path);
+        $imagePath = $gallery->image_path;
         $gallery->delete();
+        if ($imagePath) Storage::disk('public')->delete($imagePath);
         return back()->with('success', 'Foto galeri dihapus.');
     }
     private function data(Request $request, bool $imageRequired = true): array

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -25,6 +26,25 @@ class PublicPagesTest extends TestCase
         foreach ($paths as $path) {
             $this->get($path)->assertOk();
         }
+    }
+
+    public function test_public_article_escapes_untrusted_html_content(): void
+    {
+        $post = Post::create([
+            'title' => 'Konten Uji Keamanan',
+            'slug' => 'konten-uji-keamanan',
+            'category' => 'berita',
+            'content' => '<script>alert(1)</script><b>teks warga</b>',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $response = $this->get(route('posts.show', $post->slug));
+
+        $response->assertOk();
+        $response->assertDontSee('<script>', false);
+        $response->assertSee('&lt;script&gt;', false);
+        $response->assertSee('&lt;b&gt;teks warga&lt;/b&gt;', false);
     }
 
     public function test_contact_form_stores_a_valid_message(): void

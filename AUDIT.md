@@ -29,3 +29,24 @@ Tanggal audit: 16 November 2026
 
 ## Batas audit
 Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkungan CI tersebut. Ini belum merupakan jaminan bebas bug, bukan pengujian browser/manual menyeluruh, dan bukan audit keamanan deployment penuh. composer.lock belum diperbarui dari lingkungan pembuatan ini; workflow sementara menjalankan composer update. Setelah Composer tersedia di komputer pengembang, jalankan composer update lalu commit composer.lock supaya versi dependency terkunci dan konsisten.
+
+
+## Security & Quality Audit v2 — 16 November 2026
+
+### Hardening added
+- Added global response security headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and `X-Permitted-Cross-Domain-Policies`.
+- Added HSTS on HTTPS responses (without `includeSubDomains`).
+- Admin responses now set `Cache-Control: private, no-store, max-age=0`.
+- Production session cookies default to Secure when `APP_ENV=production`; local HTTP stays usable. Set `SESSION_SECURE_COOKIE=true` explicitly in HTTPS production.
+- Password updates require at least 12 characters, mixed case, numbers, and symbols.
+- Login input lengths are bounded; social profile URLs are restricted to HTTP/HTTPS.
+- Upload replacement now stores the replacement before deleting the previous image. Database records are deleted before their associated public image files are removed.
+- Added migration 000008 so existing databases also use `user` as the default role for newly inserted users.
+- Added tests for login throttling, role defaults, protected mutations, weak password rejection, HTTPS-only social URLs, non-image upload rejection, image replacement/deletion, HTML escaping, and security headers.
+
+### Remaining deliberate limitations
+- Content Security Policy is not enabled yet because several current pages use inline scripts and third-party CDN assets. A correct CSP requires moving inline scripts to nonce-protected/external files and allowlisting the required asset and OpenStreetMap tile origins.
+- Uploads are raster images only; SVG is intentionally disallowed.
+- HSTS is emitted only when Laravel detects an HTTPS request. Reverse-proxy deployments must configure trusted proxies and HTTPS termination correctly.
+- This audit and its tests do not replace production infrastructure review, dependency vulnerability monitoring, backup/restore testing, or manual browser testing.
+

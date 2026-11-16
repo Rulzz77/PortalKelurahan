@@ -26,7 +26,11 @@ class StaffController extends Controller
     {
         $data = $this->data($request);
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('staff', 'public');
+            $photoPath = $request->file('photo')->store('staff', 'public');
+            if (! $photoPath) {
+                return back()->withErrors(['photo' => 'Foto pegawai gagal disimpan. Silakan coba kembali.'])->withInput();
+            }
+            $data['photo_path'] = $photoPath;
         }
         Staff::create($data);
 
@@ -44,23 +48,28 @@ class StaffController extends Controller
     public function update(Request $request, Staff $staff): RedirectResponse
     {
         $data = $this->data($request, $staff);
+        $oldPhotoPath = $staff->photo_path;
+        $newPhotoPath = null;
         if ($request->hasFile('photo')) {
-            if ($staff->photo_path) {
-                Storage::disk('public')->delete($staff->photo_path);
+            $newPhotoPath = $request->file('photo')->store('staff', 'public');
+            if (! $newPhotoPath) {
+                return back()->withErrors(['photo' => 'Foto pegawai gagal disimpan. Foto lama tetap digunakan.'])->withInput();
             }
-            $data['photo_path'] = $request->file('photo')->store('staff', 'public');
+            $data['photo_path'] = $newPhotoPath;
         }
         $staff->update($data);
+        if ($newPhotoPath && $oldPhotoPath) {
+            Storage::disk('public')->delete($oldPhotoPath);
+        }
 
         return redirect()->route('admin.staff.index')->with('success', 'Data pegawai diperbarui.');
     }
 
     public function destroy(Staff $staff): RedirectResponse
     {
-        if ($staff->photo_path) {
-            Storage::disk('public')->delete($staff->photo_path);
-        }
+        $photoPath = $staff->photo_path;
         $staff->delete();
+        if ($photoPath) Storage::disk('public')->delete($photoPath);
 
         return back()->with('success', 'Data pegawai dihapus. Bawahan langsung akan menjadi tanpa atasan.');
     }

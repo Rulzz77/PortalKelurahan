@@ -18,6 +18,9 @@ class EnsureAdmin
             abort(403, 'Akses hanya tersedia untuk administrator.');
         }
 
-        return $next($request);
+        $response = $next($request);
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
+
+        return $response;
     }
 }

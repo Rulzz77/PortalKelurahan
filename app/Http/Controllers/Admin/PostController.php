@@ -20,7 +20,13 @@ class PostController extends Controller
         $slugInput = $data['slug'] ?? $data['title'];
         $data['slug'] = $this->uniqueSlug($slugInput);
         $data['published_at'] = $data['status'] === 'published' ? ($data['published_at'] ?? now()) : null;
-        if ($request->hasFile('cover')) $data['cover_path'] = $request->file('cover')->store('posts', 'public');
+        if ($request->hasFile('cover')) {
+            $coverPath = $request->file('cover')->store('posts', 'public');
+            if (! $coverPath) {
+                return back()->withErrors(['cover' => 'Poster gagal disimpan. Silakan coba kembali.'])->withInput();
+            }
+            $data['cover_path'] = $coverPath;
+        }
         Post::create($data);
         return redirect()->route('admin.posts.index')->with('success', 'Konten berhasil dibuat.');
     }
@@ -32,17 +38,26 @@ class PostController extends Controller
         $slugInput = $data['slug'] ?? $post->slug ?? $data['title'];
         $data['slug'] = $this->uniqueSlug($slugInput, $post->id);
         $data['published_at'] = $data['status'] === 'published' ? ($data['published_at'] ?? $post->published_at ?? now()) : null;
+        $oldCoverPath = $post->cover_path;
+        $newCoverPath = null;
         if ($request->hasFile('cover')) {
-            if ($post->cover_path) Storage::disk('public')->delete($post->cover_path);
-            $data['cover_path'] = $request->file('cover')->store('posts', 'public');
+            $newCoverPath = $request->file('cover')->store('posts', 'public');
+            if (! $newCoverPath) {
+                return back()->withErrors(['cover' => 'Poster gagal disimpan. Gambar lama tetap digunakan.'])->withInput();
+            }
+            $data['cover_path'] = $newCoverPath;
         }
         $post->update($data);
+        if ($newCoverPath && $oldCoverPath) {
+            Storage::disk('public')->delete($oldCoverPath);
+        }
         return redirect()->route('admin.posts.index')->with('success', 'Konten berhasil diperbarui.');
     }
     public function destroy(Post $post): RedirectResponse
     {
-        if ($post->cover_path) Storage::disk('public')->delete($post->cover_path);
+        $coverPath = $post->cover_path;
         $post->delete();
+        if ($coverPath) Storage::disk('public')->delete($coverPath);
         return back()->with('success', 'Konten berhasil dihapus.');
     }
     private function validated(Request $request): array
