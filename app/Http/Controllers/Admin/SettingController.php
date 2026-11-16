@@ -21,8 +21,10 @@ class SettingController extends Controller
             'email' => ['nullable', 'email', 'max:180'], 'office_hours' => ['nullable', 'string', 'max:180'],
             'office_latitude' => ['nullable', 'numeric', 'between:-90,90'], 'office_longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'hero_title' => ['required', 'string', 'max:220'], 'hero_subtitle' => ['nullable', 'string', 'max:700'],
-            'about' => ['nullable', 'string'], 'vision' => ['nullable', 'string'], 'mission' => ['nullable', 'string'], 'instagram_url' => ['nullable', 'url', 'max:255'],
-            'facebook_url' => ['nullable', 'url', 'max:255'], 'youtube_url' => ['nullable', 'url', 'max:255'],
+            'about' => ['nullable', 'string'], 'vision' => ['nullable', 'string'], 'mission' => ['nullable', 'string'],
+            'instagram_url' => ['nullable', 'url:http,https', 'max:255'],
+            'facebook_url' => ['nullable', 'url:http,https', 'max:255'],
+            'youtube_url' => ['nullable', 'url:http,https', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
         unset($data['logo']);

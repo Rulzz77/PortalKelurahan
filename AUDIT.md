@@ -7,7 +7,7 @@ Tanggal audit: 16 November 2026
 - AccountController membaca password opsional sebagai key wajib. Akses sudah diberi fallback null sehingga admin dapat mengganti nama tanpa mengganti password.
 - Migration users menggunakan role admin sebagai default. Default instalasi baru diganti menjadi user; hanya seeder yang memberi role admin pada akun pertama.
 - Penolakan login role non-admin kini membatalkan sesi dan meregenerasi token CSRF.
-- Workflow memanggil PHPUnit secara langsung dan menggunakan Mockery sebagai dependency pengujian Laravel.
+- Workflow memanggil PHPUnit secara langsung dan menggunakan Mockery sebagai dependency pengujian.
 
 ## Automated tests yang ditambahkan
 - Autentikasi admin, guest redirect, penolakan akun non-admin, dan logout.
@@ -30,7 +30,6 @@ Tanggal audit: 16 November 2026
 ## Batas audit
 Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkungan CI tersebut. Ini belum merupakan jaminan bebas bug, bukan pengujian browser/manual menyeluruh, dan bukan audit keamanan deployment penuh. composer.lock belum diperbarui dari lingkungan pembuatan ini; workflow sementara menjalankan composer update. Setelah Composer tersedia di komputer pengembang, jalankan composer update lalu commit composer.lock supaya versi dependency terkunci dan konsisten.
 
-
 ## Security & Quality Audit v2 — 16 November 2026
 
 ### Hardening added
@@ -50,11 +49,25 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 - HSTS is emitted only when Laravel detects an HTTPS request. Reverse-proxy deployments must configure trusted proxies and HTTPS termination correctly.
 - This audit and its tests do not replace production infrastructure review, dependency vulnerability monitoring, backup/restore testing, or manual browser testing.
 
-
-
 ### CI verification
 - Latest complete pipeline: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975
 - Result: success — 29 tests, 105 assertions, PHP 8.3.36 / PHPUnit 12.5.44.
 - Composer audit: no security vulnerability advisories found.
 - PHP syntax lint: all PHP files under app, bootstrap, config, database, lang, routes, and tests passed.
 - Seeder now enforces initial admin passwords of at least 12 characters with uppercase, lowercase, number, and symbol.
+
+## Security & Quality Audit v3 — 16 November 2026
+
+### Additional fixes
+- Public organization chart now fetches active staff records once and builds the full hierarchy in memory. This removes repeated lazy-load queries for deep hierarchies and supports more than the previous fixed two nested levels.
+- Public news search validates `q` as a string of at most 100 characters before applying the title filter.
+- Social profile fields explicitly accept only HTTP and HTTPS URLs; other URL schemes are rejected.
+- The admin password form's browser-side minimum length and helper text now match the server-side 12-character password policy.
+
+### Regression coverage added
+- A four-level organization chart must render all levels while using one staff SELECT query.
+- News search rejects array input and values longer than 100 characters.
+- Social profile URL validation rejects FTP and accepts HTTPS.
+
+### Verification status
+- Audit v3 changes have been committed; GitHub Actions results are tracked separately. Passing CI verifies automated tests and lint only; it does not replace manual browser testing or deployment review.
