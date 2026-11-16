@@ -2,22 +2,29 @@
 
 Starter project portal informasi kelurahan dengan halaman publik dan dashboard administrator. Proyek ini memakai Laravel 13 + Blade + Bootstrap 5 + CSS/JavaScript biasa. Tidak memakai React, Vue, atau proses npm build untuk aset aplikasi.
 
-## Menjalankan automated tests
+## Setup dan automated tests
 
-Test suite menggunakan PHPUnit 12 dan SQLite in-memory. Jalankan dari folder proyek:
+Project memakai PHPUnit 12 dan SQLite in-memory untuk pengujian. Pastikan menggunakan PHP 8.3 atau yang lebih baru sesuai batas dependency, lalu instal versi paket yang sudah dikunci:
 
-    composer update
+    composer install --no-interaction --prefer-dist
+
+Jalankan test suite:
+
     composer test
 
 Atau jalankan langsung:
 
     vendor/bin/phpunit
 
-GitHub Actions menjalankan tes otomatis saat push atau Pull Request ke branch main. Run terakhir pada 16 November 2026 lulus: 15 tests, 56 assertions, menggunakan PHP 8.3.36 dan PHPUnit 12.5.44. Lihat tab Actions di repository untuk hasil run terbaru.
+GitHub Actions memvalidasi `composer.json` dan `composer.lock`, memasang dependency dengan `composer install`, menjalankan `composer audit`, memeriksa sintaks PHP, dan menjalankan test suite saat push atau Pull Request ke branch main.
 
-Pipeline sementara menjalankan composer update untuk menyelesaikan dependency PHPUnit dan Mockery karena composer.lock pada repository belum diperbarui dari lingkungan pembuatan ini. Setelah menjalankan composer update di komputer pengembang, commit composer.lock agar dependency terkunci dan konsisten.
+**Penting:** gunakan `composer install` untuk setup biasa agar versi dependency mengikuti `composer.lock`. Jalankan `composer update` hanya saat memang ingin memperbarui versi paket. Setelah update, periksa hasilnya dengan:
 
-Cakupan tes meliputi autentikasi dan role admin, akses dashboard, CRUD layanan dan berita tanpa slug manual, update akun tanpa password baru, penyimpanan pengaturan, upload galeri, pencegahan struktur organisasi melingkar, render halaman publik, formulir kontak, serta pembuatan admin melalui seeder.
+    composer validate --strict
+    composer audit
+    composer test
+
+Cakupan tes meliputi autentikasi dan role admin, akses dashboard, CRUD layanan dan berita tanpa slug manual, update akun tanpa password baru, penyimpanan pengaturan, upload galeri, pencegahan struktur organisasi melingkar, render halaman publik, formulir kontak, pembuatan admin melalui seeder, validasi URL, dan performa query struktur organisasi.
 
 Tes otomatis bukan pengganti uji penerimaan pengguna, audit keamanan deployment, atau verifikasi data resmi kelurahan.
 
@@ -36,4 +43,4 @@ Tes otomatis bukan pengganti uji penerimaan pengguna, audit keamanan deployment,
 A Content-Security-Policy header is intentionally not enabled yet because the current Blade pages contain inline JavaScript and load styles/scripts from specific CDNs. Add CSP only after moving inline scripts to nonce-protected or external assets and explicitly allow the required tile/font/CDN origins; a generic restrictive CSP would break the map and page interactions.
 
 
-The latest completed Security & Quality Audit v2 workflow passed **29 tests and 105 assertions** on PHP 8.3.36. Composer audit reported no known security advisories, and all PHP source files passed syntax checks. [View the successful GitHub Actions run](https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975).
+The latest completed Security & Quality Audit v3 workflow passed **33 tests and 116 assertions** on PHP 8.3.36. Composer audit reported no known security advisories, and all checked PHP source files passed syntax lint. [View the successful GitHub Actions run](https://github.com/Rulzz77/PortalKelurahan/actions/runs/43825942879). The dependency lockfile has since been refreshed and the main workflow now uses `composer install` for reproducible dependency installation.

@@ -24,8 +24,10 @@ jobs:
           extensions: curl, dom, fileinfo, gd, mbstring, pdo_sqlite, xml
           coverage: none
           tools: composer:v2
-      - name: Resolve and install dependencies
-        run: composer update --no-interaction --prefer-dist --no-progress
+      - name: Validate Composer manifest and lockfile
+        run: composer validate --strict
+      - name: Install locked dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
       - name: Audit Composer dependencies
         run: composer audit --no-interaction
       - name: Lint PHP source files
@@ -36,4 +38,4 @@ jobs:
           cp .env.example .env
           php artisan key:generate
       - name: Run Laravel tests
-        run: vendor/bin/phpunit
+        run: composer test

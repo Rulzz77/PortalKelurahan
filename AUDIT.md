@@ -28,7 +28,7 @@ Tanggal audit: 16 November 2026
 - 15 tests passed, 56 assertions passed.
 
 ## Batas audit
-Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkungan CI tersebut. Ini belum merupakan jaminan bebas bug, bukan pengujian browser/manual menyeluruh, dan bukan audit keamanan deployment penuh. composer.lock belum diperbarui dari lingkungan pembuatan ini; workflow sementara menjalankan composer update. Setelah Composer tersedia di komputer pengembang, jalankan composer update lalu commit composer.lock supaya versi dependency terkunci dan konsisten.
+Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkungan CI tersebut. Ini belum merupakan jaminan bebas bug, bukan pengujian browser/manual menyeluruh, dan bukan audit keamanan deployment penuh. Kondisi lockfile yang belum sinkron pada awal audit kemudian diselesaikan pada Stabilization v4.
 
 ## Security & Quality Audit v2 — 16 November 2026
 
@@ -50,7 +50,7 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 - This audit and its tests do not replace production infrastructure review, dependency vulnerability monitoring, backup/restore testing, or manual browser testing.
 
 ### CI verification
-- Latest complete pipeline: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975
+- Full pipeline v2: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975
 - Result: success — 29 tests, 105 assertions, PHP 8.3.36 / PHPUnit 12.5.44.
 - Composer audit: no security vulnerability advisories found.
 - PHP syntax lint: all PHP files under app, bootstrap, config, database, lang, routes, and tests passed.
@@ -75,3 +75,23 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 - Composer audit: no security vulnerability advisories found.
 - PHP syntax lint: passed for all checked application, configuration, migration, language, route, and test files.
 - Passing CI verifies automated tests and lint only; it does not replace manual browser testing or deployment review.
+
+
+## Stabilization v4 — Dependency & CI — 16 November 2026
+
+### Dependency lock
+- Regenerated and validated `composer.lock` against `composer.json` on PHP 8.3 using Composer 2.11.2.
+- The lock now includes 75 production packages and 27 development packages, including `phpunit/phpunit 12.5.44` and `mockery/mockery 1.6.15`.
+- `composer validate --strict` passed, confirming the manifest and lockfile are consistent.
+- Dependency audit reported no known security vulnerability advisories.
+
+### CI stabilization
+- The main test workflow now validates the manifest/lockfile and runs `composer install` instead of resolving new versions with `composer update`.
+- Laravel tests are invoked with `composer test`.
+- Temporary lock-refresh workflow is not part of the main branch release pipeline.
+- Lockfile generation verification run: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43828033948
+- Result: success — 33 tests and 116 assertions passed with the refreshed dependency set.
+
+### Developer workflow
+- Use `composer install` for normal setup and reproducible builds.
+- Run `composer update` only when intentionally upgrading dependencies; review the resulting lockfile, then run `composer validate --strict`, `composer audit`, and `composer test` before committing.
