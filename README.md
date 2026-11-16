@@ -36,4 +36,4 @@ Tes otomatis bukan pengganti uji penerimaan pengguna, audit keamanan deployment,
 A Content-Security-Policy header is intentionally not enabled yet because the current Blade pages contain inline JavaScript and load styles/scripts from specific CDNs. Add CSP only after moving inline scripts to nonce-protected or external assets and explicitly allow the required tile/font/CDN origins; a generic restrictive CSP would break the map and page interactions.
 
 
-The latest completed Security & Quality Audit v2 workflow run before the seeder password-policy addition passed **28 tests and 104 assertions** on PHP 8.3.36. The latest commit adds an additional regression test that requires a strong admin password from environment configuration.
+The latest completed Security & Quality Audit v2 workflow passed **29 tests and 105 assertions** on PHP 8.3.36. Composer audit reported no known security advisories, and all PHP source files passed syntax checks. [View the successful GitHub Actions run](https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975).

@@ -53,6 +53,8 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 
 
 ### CI verification
-- Audit v2 test run: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824083161
-- Result: success — 28 tests, 104 assertions, PHP 8.3.36 / PHPUnit 12.5.44.
-- A follow-up seeder hardening change now enforces mixed case, numeric and symbol characters in configured initial admin passwords, with an additional regression test. Its workflow run is triggered by the latest commit and must be checked separately before counting that newest test as passed.
+- Latest complete pipeline: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43824382975
+- Result: success — 29 tests, 105 assertions, PHP 8.3.36 / PHPUnit 12.5.44.
+- Composer audit: no security vulnerability advisories found.
+- PHP syntax lint: all PHP files under app, bootstrap, config, database, lang, routes, and tests passed.
+- Seeder now enforces initial admin passwords of at least 12 characters with uppercase, lowercase, number, and symbol.
