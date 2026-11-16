@@ -7,8 +7,7 @@ Tanggal audit: 16 November 2026
 - AccountController membaca password opsional sebagai key wajib. Akses sudah diberi fallback null sehingga admin dapat mengganti nama tanpa mengganti password.
 - Migration users menggunakan role admin sebagai default. Default instalasi baru diganti menjadi user; hanya seeder yang memberi role admin pada akun pertama.
 - Penolakan login role non-admin kini membatalkan sesi dan meregenerasi token CSRF.
-- Workflow awal memanggil php artisan test tanpa Collision. Sekarang workflow memanggil PHPUnit secara langsung.
-- Test pertama membutuhkan Mockery melalui Laravel RefreshDatabase; Mockery sekarang menjadi dependency pengujian eksplisit.
+- Workflow memanggil PHPUnit secara langsung dan menggunakan Mockery sebagai dependency pengujian Laravel.
 
 ## Automated tests yang ditambahkan
 - Autentikasi admin, guest redirect, penolakan akun non-admin, dan logout.
@@ -22,5 +21,11 @@ Tanggal audit: 16 November 2026
 - Submit dan validasi formulir kontak.
 - Seeder membuat admin awal dan tidak menimpa password admin yang sudah ada.
 
+## Hasil CI yang terverifikasi
+- GitHub Actions run: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43822979987
+- Status: success.
+- PHP 8.3.36, PHPUnit 12.5.44.
+- 15 tests passed, 56 assertions passed.
+
 ## Batas audit
-Status lulus/gagal tiap run harus dilihat pada tab Actions. Lingkungan pembuatan tidak memiliki akses jaringan ke Composer, jadi composer.lock belum bisa diperbarui dan pipeline menjalankan composer update. Belum ada klaim bahwa seluruh tes runtime sudah lulus.
+Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkungan CI tersebut. Ini belum merupakan jaminan bebas bug, bukan pengujian browser/manual menyeluruh, dan bukan audit keamanan deployment penuh. composer.lock belum diperbarui dari lingkungan pembuatan ini; workflow sementara menjalankan composer update. Setelah Composer tersedia di komputer pengembang, jalankan composer update lalu commit composer.lock supaya versi dependency terkunci dan konsisten.

@@ -7,9 +7,15 @@ Starter project portal informasi kelurahan dengan halaman publik dan dashboard a
 Test suite menggunakan PHPUnit 12 dan SQLite in-memory. Jalankan dari folder proyek:
 
     composer update
-    php artisan test
+    composer test
 
-GitHub Actions menjalankan tes otomatis saat push atau Pull Request ke branch main. Pipeline sementara menjalankan composer update untuk menyelesaikan dependency PHPUnit karena composer.lock pada repository belum diperbarui dari lingkungan pembuatan ini. Setelah menjalankan composer update di komputer pengembang, commit composer.lock agar versi dependency terkunci dan konsisten.
+Atau jalankan langsung:
+
+    vendor/bin/phpunit
+
+GitHub Actions menjalankan tes otomatis saat push atau Pull Request ke branch main. Run terakhir pada 16 November 2026 lulus: 15 tests, 56 assertions, menggunakan PHP 8.3.36 dan PHPUnit 12.5.44. Lihat tab Actions di repository untuk hasil run terbaru.
+
+Pipeline sementara menjalankan composer update untuk menyelesaikan dependency PHPUnit dan Mockery karena composer.lock pada repository belum diperbarui dari lingkungan pembuatan ini. Setelah menjalankan composer update di komputer pengembang, commit composer.lock agar dependency terkunci dan konsisten.
 
 Cakupan tes meliputi autentikasi dan role admin, akses dashboard, CRUD layanan dan berita tanpa slug manual, update akun tanpa password baru, penyimpanan pengaturan, upload galeri, pencegahan struktur organisasi melingkar, render halaman publik, formulir kontak, serta pembuatan admin melalui seeder.
 
