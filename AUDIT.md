@@ -69,5 +69,9 @@ Hasil di atas membuktikan test suite otomatis yang tersedia lulus pada lingkunga
 - News search rejects array input and values longer than 100 characters.
 - Social profile URL validation rejects FTP and accepts HTTPS.
 
-### Verification status
-- Audit v3 changes have been committed; GitHub Actions results are tracked separately. Passing CI verifies automated tests and lint only; it does not replace manual browser testing or deployment review.
+### Verification
+- GitHub Actions run: https://github.com/Rulzz77/PortalKelurahan/actions/runs/43825942879
+- Result: success — 33 tests and 116 assertions passed.
+- Composer audit: no security vulnerability advisories found.
+- PHP syntax lint: passed for all checked application, configuration, migration, language, route, and test files.
+- Passing CI verifies automated tests and lint only; it does not replace manual browser testing or deployment review.
