@@ -17,12 +17,15 @@ class AccountController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'current_password' => ['required', 'current_password'],
-            'password' => ['nullable', 'confirmed', 'min:10'],
+            'password' => ['nullable', 'string', 'confirmed', 'min:10'],
         ]);
         $user = $request->user();
         $user->name = $data['name'];
-        if (! empty($data['password'])) $user->password = Hash::make($data['password']);
+        if (! empty($data['password'] ?? null)) {
+            $user->password = Hash::make($data['password']);
+        }
         $user->save();
+
         return back()->with('success', 'Profil akun berhasil diperbarui.');
     }
 }
