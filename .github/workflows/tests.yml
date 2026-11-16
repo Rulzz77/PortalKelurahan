@@ -26,6 +26,11 @@ jobs:
           tools: composer:v2
       - name: Resolve and install dependencies
         run: composer update --no-interaction --prefer-dist --no-progress
+      - name: Audit Composer dependencies
+        run: composer audit --no-interaction
+      - name: Lint PHP source files
+        run: |
+          find app bootstrap config database lang routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Prepare environment
         run: |
           cp .env.example .env
