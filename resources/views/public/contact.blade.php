@@ -1,0 +1,21 @@
+@extends('layouts.public')
+@section('title', 'Kontak & Lokasi')
+@push('styles')<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">@endpush
+@section('content')
+<section class="page-hero"><div class="container"><div class="breadcrumb-lite"><a href="{{ route('home') }}">Beranda</a><i class="bi bi-chevron-right"></i><span>Kontak</span></div><span class="section-kicker">KAMI SIAP MEMBANTU</span><h1>Kontak & Lokasi Kantor</h1><p>Gunakan informasi di bawah ini untuk menghubungi kantor kelurahan.</p></div></section>
+<section class="section-pad"><div class="container"><div class="row g-4"><div class="col-lg-5"><div class="contact-info-stack"><div class="contact-info-card"><span><i class="bi bi-geo-alt"></i></span><div><small>ALAMAT KANTOR</small><b>{{ $settings->office_address ?: 'Alamat kantor belum diatur oleh administrator.' }}</b></div></div><div class="contact-info-card"><span><i class="bi bi-telephone"></i></span><div><small>TELEPON</small><b>{{ $settings->phone ?: 'Nomor telepon belum diatur.' }}</b></div></div><div class="contact-info-card"><span><i class="bi bi-envelope"></i></span><div><small>EMAIL</small><b>{{ $settings->email ?: 'Email kantor belum diatur.' }}</b></div></div><div class="contact-info-card"><span><i class="bi bi-clock"></i></span><div><small>JAM PELAYANAN</small><b>{{ $settings->office_hours ?: 'Jam pelayanan belum diatur.' }}</b></div></div></div><div class="map-card mt-4"><div class="map-card-heading"><b><i class="bi bi-map me-2"></i>Lokasi Kantor</b><span>OpenStreetMap</span></div><div id="publicOfficeMap" class="public-map"></div>@if(is_null($settings->office_latitude) || is_null($settings->office_longitude))<p class="small text-secondary p-3 mb-0">Lokasi peta belum ditentukan. Administrator dapat mengatur titik kantor melalui menu Identitas & Peta.</p>@else<p class="small text-secondary p-3 mb-0">Peta menggunakan data peta OpenStreetMap.</p>@endif</div></div><div class="col-lg-7"><div class="contact-form-card"><span class="section-kicker">KIRIM PESAN</span><h2 class="h3 mb-2">Ada yang ingin ditanyakan?</h2><p class="text-secondary mb-4">Lengkapi formulir berikut. Pesan akan diterima oleh administrator website.</p><form method="POST" action="{{ route('contact.store') }}">@csrf<div class="row g-3"><div class="col-md-6"><label class="form-label">Nama lengkap *</label><input class="form-control" type="text" name="name" value="{{ old('name') }}" required maxlength="120"></div><div class="col-md-6"><label class="form-label">Email *</label><input class="form-control" type="email" name="email" value="{{ old('email') }}" required maxlength="160"></div><div class="col-md-6"><label class="form-label">Nomor telepon</label><input class="form-control" type="text" name="phone" value="{{ old('phone') }}" maxlength="30"></div><div class="col-md-6"><label class="form-label">Subjek *</label><input class="form-control" type="text" name="subject" value="{{ old('subject') }}" required maxlength="160"></div><div class="col-12"><label class="form-label">Pesan *</label><textarea class="form-control" rows="6" name="message" minlength="10" maxlength="5000" required>{{ old('message') }}</textarea></div><div class="col-12"><button class="btn btn-primary btn-lg" type="submit">Kirim Pesan <i class="bi bi-send ms-2"></i></button><p class="small text-secondary mt-3 mb-0">Jangan mengirimkan NIK, nomor KK, kata sandi, atau dokumen pribadi melalui formulir ini.</p></div></div></form></div></div></div></div></section>
+@endsection
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const el = document.getElementById('publicOfficeMap');
+    if (!el || typeof L === 'undefined') return;
+    const hasPoint = @json(!is_null($settings->office_latitude) && !is_null($settings->office_longitude));
+    const point = hasPoint ? [Number(@json($settings->office_latitude)), Number(@json($settings->office_longitude))] : [-2.5, 118];
+    const map = L.map(el, {scrollWheelZoom: false}).setView(point, hasPoint ? 15 : 4.3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap'}).addTo(map);
+    if (hasPoint) L.marker(point).addTo(map).bindPopup(@json($settings->office_name)).openPopup();
+});
+</script>
+@endpush

@@ -1,0 +1,7 @@
+@extends('layouts.admin')
+@section('title', 'Pesan Warga')
+@section('page-heading', 'Pesan Warga')
+@section('content')
+<div class="admin-page-heading"><div><h2>Pesan Warga</h2><p>Pesan yang dikirim melalui formulir kontak website publik.</p></div></div>
+<div class="admin-panel"><div class="table-responsive"><table class="table admin-table align-middle"><thead><tr><th>Pengirim</th><th>Subjek</th><th>Kontak</th><th>Tanggal</th><th>Status</th><th class="text-end">Aksi</th></tr></thead><tbody>@forelse($messages as $message)<tr><td><b>{{ $message->name }}</b><small class="d-block text-secondary">{{ $message->email }}</small></td><td>{{ $message->subject }}</td><td class="small">{{ $message->phone ?: '—' }}</td><td class="small text-secondary">{{ $message->created_at->format('d/m/Y H:i') }}</td><td><span class="status-pill {{ $message->is_read ? 'status-read' : 'status-unread' }}">{{ $message->is_read ? 'Dibaca' : 'Baru' }}</span></td><td class="text-end"><div class="d-inline-flex gap-1"><a class="btn btn-sm btn-light" href="{{ route('admin.messages.show',$message) }}"><i class="bi bi-eye"></i></a><form method="POST" action="{{ route('admin.messages.destroy',$message) }}" data-confirm="Hapus pesan ini?">@csrf @method('DELETE')<button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button></form></div></td></tr>@empty<tr><td colspan="6"><div class="empty-inline">Belum ada pesan dari masyarakat.</div></td></tr>@endforelse</tbody></table></div><div class="p-3">{{ $messages->links() }}</div></div>
+@endsection

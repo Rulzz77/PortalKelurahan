@@ -1,0 +1,7 @@
+@extends('layouts.admin')
+@section('title', 'Galeri Kegiatan')
+@section('page-heading', 'Galeri Kegiatan')
+@section('content')
+<div class="admin-page-heading"><div><h2>Galeri Kegiatan</h2><p>Unggah dokumentasi kegiatan kelurahan untuk ditampilkan di website.</p></div><a href="{{ route('admin.galleries.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-2"></i>Tambah Foto</a></div>
+<div class="row g-3">@forelse($items as $item)<div class="col-6 col-md-4 col-xl-3"><div class="gallery-admin-card"><img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->title }}"><div class="gallery-admin-info"><b>{{ $item->title }}</b><small>{{ $item->activity_date?->format('d/m/Y') ?: 'Tanggal tidak diatur' }}</small><div class="d-flex gap-2 mt-2"><a class="btn btn-sm btn-light flex-grow-1" href="{{ route('admin.galleries.edit',$item) }}"><i class="bi bi-pencil me-1"></i>Edit</a><form method="POST" action="{{ route('admin.galleries.destroy',$item) }}" data-confirm="Hapus foto ini?">@csrf @method('DELETE')<button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button></form></div></div></div></div>@empty<div class="col-12"><div class="empty-state"><i class="bi bi-images"></i><h5>Galeri masih kosong</h5><p>Tambahkan foto kegiatan untuk ditampilkan kepada masyarakat.</p></div></div>@endforelse</div><div class="mt-4">{{ $items->links() }}</div>
+@endsection
