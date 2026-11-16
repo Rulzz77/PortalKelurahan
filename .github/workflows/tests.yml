@@ -1,0 +1,34 @@
+name: Laravel Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Laravel Feature Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, dom, fileinfo, gd, mbstring, pdo_sqlite, xml
+          coverage: none
+          tools: composer:v2
+      - name: Resolve and install dependencies
+        run: composer update --no-interaction --prefer-dist --no-progress
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - name: Run Laravel tests
+        run: php artisan test

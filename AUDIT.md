@@ -1,22 +1,24 @@
 # Catatan audit source Portal Kelurahan
 
-Tanggal: 16 November 2026
+Tanggal audit: 16 November 2026
 
-## Perbaikan pada paket ini
+## Temuan yang sudah diperbaiki
+- Seeder admin tidak tersedia meski README meminta migrate --seed. Seeder idempoten sekarang membuat akun administrator dan pengaturan awal.
+- AccountController membaca password opsional sebagai key wajib. Akses sudah diberi fallback null sehingga admin dapat mengganti nama tanpa mengganti password.
+- Migration users menggunakan role admin sebagai default. Default instalasi baru diganti menjadi user; hanya seeder yang memberi role admin pada akun pertama.
+- Penolakan login role non-admin kini membatalkan sesi dan meregenerasi token CSRF.
 
-- Memperbaiki `ServiceController`: field `slug` dan `icon` kini aman ketika tidak dikirim. Saat edit, slug layanan lama dipertahankan jika tidak diberikan.
-- Memperbaiki `PostController`: slug berita/pengumuman tidak lagi diakses sebagai array key wajib; URL lama dipertahankan saat judul diedit tanpa slug baru.
-- Menyamakan validasi panjang `office_address` (maksimal 255 karakter) dengan kolom database `VARCHAR(255)`.
-- Menampilkan pesan validasi pada layout publik, termasuk halaman formulir kontak.
-- Tidak menyertakan database SQLite kosong pada ZIP agar proses ekstraksi pembaruan tidak menimpa database lokal yang sudah berisi data.
-
-## Pemeriksaan yang dilakukan
-
-- Seluruh file PHP pada folder `app`, `bootstrap`, `config`, `database`, `lang`, `routes`, dan `public` diperiksa dengan `php -l`.
-- Referensi nama route pada Blade dicocokkan dengan route eksplisit dan nama route resource.
-- Nama field pada form admin dibandingkan dengan validasi controller.
-- Relasi model, nama tabel/kolom, upload file, dan middleware dashboard diperiksa secara statis.
+## Automated tests yang ditambahkan
+- Autentikasi admin, guest redirect, penolakan akun non-admin, dan logout.
+- Membuat service tanpa slug manual.
+- Membuat berita terbit tanpa slug manual.
+- Memperbarui nama akun tanpa mengirim password baru.
+- Menyimpan pengaturan situs tanpa unggah logo.
+- Upload foto galeri ke public disk.
+- Mencegah relasi struktur organisasi membentuk siklus.
+- Render halaman publik utama.
+- Submit dan validasi formulir kontak.
+- Seeder membuat admin awal dan tidak menimpa password admin yang sudah ada.
 
 ## Batas pemeriksaan
-
-Pemeriksaan runtime Laravel belum dapat dilakukan di lingkungan audit ini karena Composer, ekstensi PDO SQLite, dan dependensi `vendor` tidak tersedia. Karena itu, migrasi, login melalui browser, operasi CRUD, dan rendering Blade tetap perlu diuji di komputer yang menjalankan proyek. Ini bukan klaim bahwa aplikasi sudah lulus pengujian end-to-end.
+Test suite dan GitHub Actions sudah disiapkan, tetapi status lulus/gagal harus dilihat pada tab Actions setelah workflow selesai. Lingkungan pembuatan tidak memiliki akses jaringan ke Composer, jadi composer.lock belum bisa diperbarui dan pipeline menjalankan composer update. Belum ada klaim bahwa seluruh tes runtime sudah lulus.
