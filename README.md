@@ -7,11 +7,7 @@ Starter project portal informasi kelurahan dengan halaman publik dan dashboard a
 Test suite menggunakan PHPUnit 12 dan SQLite in-memory. Jalankan dari folder proyek:
 
     composer update
-    composer test
-
-Atau jalankan langsung:
-
-    vendor/bin/phpunit
+    php artisan test
 
 GitHub Actions menjalankan tes otomatis saat push atau Pull Request ke branch main. Pipeline sementara menjalankan composer update untuk menyelesaikan dependency PHPUnit karena composer.lock pada repository belum diperbarui dari lingkungan pembuatan ini. Setelah menjalankan composer update di komputer pengembang, commit composer.lock agar versi dependency terkunci dan konsisten.
 
