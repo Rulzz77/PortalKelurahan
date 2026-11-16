@@ -175,7 +175,7 @@ class AdminContentManagementTest extends TestCase
         $this->from(route('admin.galleries.create'))
             ->post(route('admin.galleries.store'), [
                 'title' => 'File Tidak Valid',
-                'image' => UploadedFile::fake()->createWithContent('not-an-image.jpg', 'plain text is not an image'),
+                'image' => UploadedFile::fake()->create('not-allowed.svg', 1, 'image/svg+xml'),
             ])
             ->assertSessionHasErrors('image');
 
